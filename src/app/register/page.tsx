@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from 'react';
 import styles from '../../styles/register.module.scss';
@@ -6,16 +6,38 @@ import { API_URL } from '../../Variables';
 import Link from 'next/link';
 
 export default function RegisterPage() {
+    // State for form inputs
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
+    
+    // State for global error and loading
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleRegister = async (e: { preventDefault: () => void; }) => {
+    // Function to validate fields
+    const validateFields = () => {
+        // Reset error
+        setError('');
+
+        // Check required fields
+        if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
+            setError('Wszystkie pola są wymagane');
+            return false;
+        }
+
+        return true;
+    };
+
+    // Function to handle registration
+    const handleRegister = async (e: { preventDefault: () => void }) => {
         e.preventDefault();
+        if (!validateFields()) {
+            return;  // If validation fails, stop here
+        }
+
         setLoading(true);
     
         try {
@@ -36,8 +58,7 @@ export default function RegisterPage() {
           const data = await response.json();
     
           if (response.ok) {
-            // zarejestrowano
-            console.log('zarejestrowano: ' + data)
+            console.log('zarejestrowano: ' + data);
             setLoading(false);
           } else {
             setError('Błąd podczas rejestracji');
@@ -49,7 +70,7 @@ export default function RegisterPage() {
         } finally {
           setLoading(false);
         }
-      };
+    };
 
     return (
         <section className={styles.section}>
@@ -79,7 +100,10 @@ export default function RegisterPage() {
                         <label className={styles.label}>Numer telefonu</label>
                         <input className={styles.input} type="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
                     </p>
-                    <p className={styles.error}>{error && error}</p>
+                    {/* Global error message */}
+                    {error && (
+                      <p className={styles.error}>{error && error}</p>
+                    )}
                     <button className={styles.button} type="submit" onClick={handleRegister}>
                         {loading ? 
                             <svg className={styles.loader} xmlns="http://www.w3.org/2000/svg" width="20" fill="#ffffff" viewBox="0 0 512 512"><path d="M463.9 376c7.6 4.4 17.5 1.8 21.4-6.1c17.1-34.3 26.7-73 26.7-113.9C512 120 405.9 8.8 272 .5c-8.8-.5-16 6.7-16 15.5s7.2 15.9 16 16.6C388.2 40.8 480 137.7 480 256c0 35.1-8.1 68.3-22.5 97.9c-3.9 8-1.3 17.7 6.4 22.1z"/></svg>
@@ -91,5 +115,5 @@ export default function RegisterPage() {
                 <Link className={styles.link} href="/login">Przejdź do logowania</Link>
             </div>
         </section>
-    )
+    );
 }

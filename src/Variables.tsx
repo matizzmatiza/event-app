@@ -1,1 +1,1 @@
-export const API_URL = "https://betowen.pl/api";
+export const API_URL = "https://betowen.pl:8443/api";
