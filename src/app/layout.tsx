@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pl">
-      <body style={{backgroundImage: `url('/img/stars.svg')`}}>
+      <body style={{backgroundImage: `url('/img/bg.svg')`}}>
         <HeaderPublic />
         {children}
       </body>
