@@ -17,58 +17,55 @@ export default function RegisterPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Function to validate fields
-    const validateFields = () => {
-        // Reset error
-        setError('');
-
-        // Check required fields
-        if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
-            setError('Wszystkie pola są wymagane');
-            return false;
-        }
-
-        return true;
-    };
-
     // Function to handle registration
     const handleRegister = async (e: { preventDefault: () => void }) => {
         e.preventDefault();
-        if (!validateFields()) {
-            return;  // If validation fails, stop here
-        }
 
+        // Reset error and start loading
+        setError('');
         setLoading(true);
     
         try {
-          const response = await fetch(`${API_URL}/register`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              firstName,
-              lastName,
-              email,
-              password,
-              phone,
-            }),
-          });
+            const response = await fetch(`${API_URL}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                    phone,
+                }),
+            });
     
-          const data = await response.json();
+            const data = await response.json();
     
-          if (response.ok) {
-            console.log('zarejestrowano: ' + data);
-            setLoading(false);
-          } else {
-            setError('Błąd podczas rejestracji');
-            setLoading(false);
-          }
+            if (response.ok) {
+                console.log('Zarejestrowano: ' + data);
+                setLoading(false);
+                // Można przekierować użytkownika lub wyczyścić formularz po sukcesie rejestracji
+                setFirstName('');
+                setLastName('');
+                setEmail('');
+                setPassword('');
+                setPhone('');
+                // Możesz również dodać przekierowanie na stronę logowania
+            } else {
+                // Wyświetl błędy zwrócone przez API
+                if (data.errors) {
+                    const messages = data.errors.join(', ');
+                    setError(messages); // Wszystkie błędy w jednym ciągu tekstowym
+                } else {
+                    setError('Błąd podczas rejestracji. Spróbuj ponownie.');
+                }
+                setLoading(false);
+            }
         } catch (err) {
-          console.error('Wystąpił błąd podczas rejestracji:', err);
-          setError('Wystąpił błąd podczas rejestracji');
-        } finally {
-          setLoading(false);
+            console.error('Wystąpił błąd podczas rejestracji:', err);
+            setError('Wystąpił błąd podczas rejestracji. Spróbuj ponownie.');
+            setLoading(false);
         }
     };
 
@@ -97,12 +94,12 @@ export default function RegisterPage() {
                         <input className={styles.input} type="password" value={password} required onChange={(e) => setPassword(e.target.value)} />
                     </p>
                     <p className={styles['label-wrapper']}>
-                        <label className={styles.label}>Numer telefonu</label>
+                        <label className={styles.label}>Numer telefonu (opcjonalnie)</label>
                         <input className={styles.input} type="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
                     </p>
                     {/* Global error message */}
                     {error && (
-                      <p className={styles.error}>{error && error}</p>
+                      <p className={styles.error}>{error}</p>
                     )}
                     <button className={styles.button} type="submit" onClick={handleRegister}>
                         {loading ? 
