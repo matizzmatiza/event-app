@@ -79,19 +79,19 @@ export default function RegisterPage() {
                 <form className={styles.form}>
                     <p className={styles['label-wrapper']}>
                         <label className={styles.label}>Imię*</label>
-                        <input className={styles.input} type="text" value={firstName} required onChange={(e) => setFirstName(e.target.value)} />
+                        <input className={styles.input} type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                     </p>
                     <p className={styles['label-wrapper']}>
                         <label className={styles.label}>Nazwisko*</label>
-                        <input className={styles.input} type="text" value={lastName} required onChange={(e) => setLastName(e.target.value)} />
+                        <input className={styles.input} type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                     </p>
                     <p className={styles['label-wrapper']}>
                         <label className={styles.label}>E-mail*</label>
-                        <input className={styles.input} type="email" value={email} required onChange={(e) => setEmail(e.target.value)} />
+                        <input className={styles.input} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                     </p>
                     <p className={styles['label-wrapper']}>
                         <label className={styles.label}>Hasło*</label>
-                        <input className={styles.input} type="password" value={password} required onChange={(e) => setPassword(e.target.value)} />
+                        <input className={styles.input} type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                     </p>
                     <p className={styles['label-wrapper']}>
                         <label className={styles.label}>Numer telefonu (opcjonalnie)</label>
