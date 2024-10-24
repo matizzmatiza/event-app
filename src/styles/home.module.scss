@@ -1,0 +1,44 @@
+.baner {
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+    min-height: calc(100svh - 60px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.baner-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 10px 10px 0 var(--darkblue);
+}
+
+.title {
+    font-size: 6rem;
+    font-weight: 900;
+    text-align: center;
+}
+
+.sub-title {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.section {
+    max-width: 1000px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 3rem 1rem;
+    padding-top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

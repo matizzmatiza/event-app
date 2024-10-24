@@ -4,8 +4,10 @@ import React, { useState } from 'react';
 import styles from '../../styles/register.module.scss';
 import { API_URL } from '../../Variables';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
+    const router = useRouter();
     // State for form inputs
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -52,6 +54,7 @@ export default function RegisterPage() {
                 setPassword('');
                 setPhone('');
                 // Możesz również dodać przekierowanie na stronę logowania
+                router.push('/login');
             } else {
                 // Wyświetl błędy zwrócone przez API
                 if (data.errors) {
