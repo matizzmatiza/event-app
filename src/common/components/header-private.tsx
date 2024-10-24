@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import styles from '../../styles/header.module.scss';
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export function HeaderPrivate() {
     const [menuOpen, setMenuOpen] = useState(false);
+    const router = useRouter();
 
     const openMenu = () => {
         setMenuOpen(true)
@@ -13,6 +15,12 @@ export function HeaderPrivate() {
 
     const closeMenu = () => {
         setMenuOpen(false)
+    }
+
+    const handleLogout = () => {
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'; 
+        localStorage.removeItem('token');
+        router.push('/login');
     }
 
     return (
@@ -33,7 +41,7 @@ export function HeaderPrivate() {
                             <Link href="/dashboard" onClick={closeMenu}>Dashboard</Link>
                         </li>
                         <li className={styles['menu-item']}>
-                            <Link href="/" onClick={closeMenu}>Wyloguj się</Link>
+                            <button className={styles['logout-button']} onClick={handleLogout}>Wyloguj się</button>
                         </li>
                     </ul>
                     <button className={styles['menu-button']} onClick={openMenu}>

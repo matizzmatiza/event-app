@@ -9,10 +9,6 @@ import { useRouter } from 'next/navigation';
 export default function LoginPage() {
     const router = useRouter();
 
-    function handleSetToken(token: string) {
-        document.cookie = `token=${token}; Path=/; Secure; HttpOnly; SameSite=Strict;`;
-    }
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -38,7 +34,7 @@ export default function LoginPage() {
                 localStorage.setItem('token', data.token);
                 // Successful login
                 console.log('Zalogowano pomyślnie');
-                handleSetToken(data.token);
+                document.cookie = `token=${data.token}; path=/`;
                 router.push('/dashboard');
                 setLoading(false);
             } else {

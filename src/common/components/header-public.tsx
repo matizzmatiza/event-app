@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import styles from '../../styles/header.module.scss';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export function HeaderPublic() {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [tokenStatus, setTokenStatus] = useState(false);
 
     const openMenu = () => {
         setMenuOpen(true)
@@ -14,6 +15,17 @@ export function HeaderPublic() {
     const closeMenu = () => {
         setMenuOpen(false)
     }
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+          const token = localStorage.getItem('token');
+          if (token !== null) {
+            setTokenStatus(true);
+          } else {
+            setTokenStatus(false);
+          }
+        }
+    }, []);
 
     return (
         <>
@@ -30,7 +42,8 @@ export function HeaderPublic() {
                             </button>
                         </li>
                         <li className={styles['menu-item']}>
-                            <Link href="/" onClick={closeMenu}>Home</Link>
+                            {!tokenStatus ? <Link href="/" onClick={closeMenu}>Home</Link> : null}
+                            {tokenStatus ? <Link href="/dashboard" onClick={closeMenu}>Panel użytkownika</Link> : null}
                         </li>
                         <li className={styles['menu-item']}>
                             <Link href="/" onClick={closeMenu}>O nas</Link>
