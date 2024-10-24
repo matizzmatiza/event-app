@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import styles from '../../styles/header.module.scss';
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export function HeaderPublic() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [tokenStatus, setTokenStatus] = useState(false);
+    const router = useRouter();
 
     const openMenu = () => {
         setMenuOpen(true)
@@ -14,6 +16,12 @@ export function HeaderPublic() {
 
     const closeMenu = () => {
         setMenuOpen(false)
+    }
+
+    const handleLogout = () => {
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'; 
+        localStorage.removeItem('token');
+        router.push('/login');
     }
 
     useEffect(() => {
@@ -42,21 +50,34 @@ export function HeaderPublic() {
                             </button>
                         </li>
                         <li className={styles['menu-item']}>
-                            {!tokenStatus ? <Link href="/" onClick={closeMenu}>Home</Link> : null}
-                            {tokenStatus ? <Link href="/dashboard" onClick={closeMenu}>Panel użytkownika</Link> : null}
+                            <Link href="/" onClick={closeMenu}>Home</Link>
                         </li>
                         <li className={styles['menu-item']}>
                             <Link href="/" onClick={closeMenu}>O nas</Link>
                         </li>
-                        <li className={styles['menu-item']}>
-                            <Link href="/login" onClick={closeMenu}>Logowanie</Link>
-                        </li>
-                        <li className={styles['menu-item']}>
-                            <Link href="/register" onClick={closeMenu}>Rejestracja</Link>
-                        </li>
+                        {!tokenStatus ? (
+                            <>
+                                <li className={styles['menu-item']}>
+                                    <Link href="/login" onClick={closeMenu}>Logowanie</Link>
+                                </li>
+                                <li className={styles['menu-item']}>
+                                    <Link href="/register" onClick={closeMenu}>Rejestracja</Link>
+                                </li>
+                            </>
+                        ) : null}
                         <li className={styles['menu-item']}>
                             <Link href="/" onClick={closeMenu}>Support</Link>
                         </li>
+                        {tokenStatus ? (
+                            <>
+                                <li className={styles['menu-item']}>
+                                    <Link href="/dashboard" onClick={closeMenu}>Panel użytkownika</Link>
+                                </li>
+                                <li className={styles['menu-item']}>
+                                    <button className={styles['logout-button']} onClick={handleLogout}>Wyloguj się</button>
+                                </li>
+                            </>
+                        ) : null}
                     </ul>
                     <button className={styles['menu-button']} onClick={openMenu}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 448 512"><path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l256 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM192 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l128 0c17.7 0 32 14.3 32 32z"/></svg>
