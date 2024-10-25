@@ -115,6 +115,7 @@ export default function EventPage() {
                 Dodaj zdjęcia z urządzenia
                 <VisuallyHiddenInput
                   type="file"
+                  accept="image/*"
                   onChange={handleFileChange}
                   multiple
                 />
