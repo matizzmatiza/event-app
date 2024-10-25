@@ -99,7 +99,7 @@ export default function EventPage() {
                 Dodaj zdjęcia
               </Button>
             </div>
-            
+            {eventId}
           </div>
         </section>
         <Dialog open={open} onClose={handleClose}>
