@@ -38,7 +38,7 @@ export function HeaderPrivate() {
                             </button>
                         </li>
                         <li className={styles['menu-item']}>
-                            <Link href="/dashboard" onClick={closeMenu}>Dashboard</Link>
+                            <Link href="/dashboard" onClick={closeMenu}>Panel użytkownika</Link>
                         </li>
                         <li className={styles['menu-item']}>
                             <button className={styles['logout-button']} onClick={handleLogout}>Wyloguj się</button>

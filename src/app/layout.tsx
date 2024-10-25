@@ -12,10 +12,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pl">
-      <body style={{ backgroundImage: `url('/img/bg.svg')` }}>
-        {children}
-      </body>
-    </html>
+      <html lang="pl">
+        <body>
+          {children}
+        </body>
+      </html>
   );
 }
