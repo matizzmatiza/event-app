@@ -2,13 +2,15 @@
 
 import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Dialog, Button, IconButton } from '@mui/material';
+import { Dialog, Button, IconButton, LinearProgress, Typography, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import styles from '../../../styles/event.module.scss';
 import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close'; // Ikona do usuwania zdjęć
+import { API_URL } from '../../../Variables';
+import axios from 'axios';
 
 const theme = createTheme({
   palette: {
@@ -55,33 +57,103 @@ const ThumbnailImage = styled('img')({
   objectFit: 'cover',
 });
 
+// Komponent paska postępu z etykietą
+function LinearProgressWithLabel(props: { value: number }) {
+  return (
+    <Box display="flex" alignItems="center" mt={2}>
+      <Box width="100%" mr={1}>
+        <LinearProgress variant="determinate" {...props} />
+      </Box>
+      <Box minWidth={35}>
+        <Typography variant="body2" color="textSecondary">{`${Math.round(props.value)}%`}</Typography>
+      </Box>
+    </Box>
+  );
+}
+
 export default function EventPage() {
   const { eventId } = useParams();
   const [open, setOpen] = useState(false);
   const [fileCount, setFileCount] = useState(0);
   const [thumbnails, setThumbnails] = useState<string[]>([]); // Przechowuje URL-e miniatur
+  const [files, setFiles] = useState<File[]>([]); // Przechowuje rzeczywiste pliki
+  const [senderName, setSenderName] = useState('');
+  const [progress, setProgress] = useState(0); // Stan dla paska postępu
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   // Obsługuje dodanie plików i aktualizuje miniaturki
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const fileArray = Array.from(files).slice(0, 9); // Zmiana limitu do 9 zdjęć
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = event.target.files;
+    if (selectedFiles) {
+      const fileArray = Array.from(selectedFiles).slice(0, 9); // Zmiana limitu do 9 zdjęć
+      setFiles(fileArray); // Ustaw rzeczywiste pliki
       setFileCount(fileArray.length);
 
       // Tworzy URL-e do podglądu plików
       const newThumbnails = fileArray.map(file => URL.createObjectURL(file));
       setThumbnails(newThumbnails);
     }
-};
+  };
 
   // Usuwa miniaturkę na podstawie indeksu
   const handleRemoveThumbnail = (index: number) => {
     const updatedThumbnails = thumbnails.filter((_, i) => i !== index);
     setThumbnails(updatedThumbnails);
-    setFileCount(updatedThumbnails.length);
+
+    const updatedFiles = files.filter((_, i) => i !== index); // Aktualizuj tablicę plików
+    setFiles(updatedFiles);
+    setFileCount(updatedFiles.length);
+  };
+
+  const handleUpload = async () => {
+    if (!eventId) return;
+
+    if (!senderName) {
+        setErrorMessage('Proszę wpisać swoje imię.');
+        return;
+      }
+    
+      if (files.length === 0) {
+        setErrorMessage('Proszę dodać co najmniej jedno zdjęcie.');
+        return;
+      }
+    
+      setErrorMessage('');
+  
+    const formData = new FormData();
+    formData.append('sender', senderName);
+    formData.append('eventId', eventId as string);
+  
+    files.forEach((file, index) => {
+      formData.append(`file_${index}`, file);
+    });
+  
+    try {
+      const response = await axios.post(`${API_URL}/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {  // Sprawdzenie, czy total jest zdefiniowane
+              const percentComplete = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              setProgress(percentComplete); // Aktualizuje pasek postępu
+            }
+          }
+      });
+  
+      console.log('Pliki przesłane pomyślnie:', response.data);
+  
+      // Zamyka dialog po 0.5 sekundy od zakończenia przesyłania
+      setTimeout(() => {
+        setOpen(false);
+        setProgress(0); // Resetuje pasek postępu
+      }, 500);
+    } catch (error) {
+      console.error('Błąd podczas przesyłania plików:', error);
+    }
   };
 
   return (
@@ -105,7 +177,13 @@ export default function EventPage() {
         <Dialog open={open} onClose={handleClose}>
           <div className={styles.popup}>
             <form className={styles.form}>
-              <TextField id="filled-basic" label="Twoje imię" variant="outlined" />
+              <TextField
+                id="filled-basic"
+                label="Twoje imię"
+                variant="outlined"
+                value={senderName}
+                onChange={(e) => setSenderName(e.target.value)}
+              />
               <Button
                 component="label"
                 variant="outlined"
@@ -125,7 +203,6 @@ export default function EventPage() {
                   Przesłane: {fileCount} / 9
                 </p>
               )}
-              {/* Wyświetlanie miniaturek w siatce */}
               <ThumbnailContainer>
                 {thumbnails.map((src, index) => (
                   <Thumbnail key={index}>
@@ -146,7 +223,9 @@ export default function EventPage() {
                   </Thumbnail>
                 ))}
               </ThumbnailContainer>
-              <Button variant="contained">Prześlij do galerii</Button>
+              <Button variant="contained" onClick={handleUpload}>Prześlij do galerii</Button>
+              {progress > 0 && <LinearProgressWithLabel value={progress} />}
+              {errorMessage && <p className={styles['error-message']}>{errorMessage}</p>}
               <p className={styles.info}>(Możesz przesłać do 9 zdjęc na raz)</p>
             </form>
           </div>
