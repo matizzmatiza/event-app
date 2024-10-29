@@ -110,18 +110,17 @@ export default function EventPage() {
 
   const handleUpload = async () => {
     if (!eventId) return;
-
+  
+    // Walidacja
     if (!senderName) {
-        setErrorMessage('Proszę wpisać swoje imię.');
-        return;
-      }
-    
-      if (files.length === 0) {
-        setErrorMessage('Proszę dodać co najmniej jedno zdjęcie.');
-        return;
-      }
-    
-      setErrorMessage('');
+      setErrorMessage('Proszę wpisać swoje imię.');
+      return;
+    }
+    if (files.length === 0) {
+      setErrorMessage('Proszę dodać co najmniej jedno zdjęcie.');
+      return;
+    }
+    setErrorMessage('');
   
     const formData = new FormData();
     formData.append('sender', senderName);
@@ -137,11 +136,11 @@ export default function EventPage() {
           'Content-Type': 'multipart/form-data',
         },
         onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {  // Sprawdzenie, czy total jest zdefiniowane
-              const percentComplete = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              setProgress(percentComplete); // Aktualizuje pasek postępu
-            }
+          if (progressEvent.total) {
+            const percentComplete = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setProgress(percentComplete); // Aktualizuje pasek postępu
           }
+        },
       });
   
       console.log('Pliki przesłane pomyślnie:', response.data);
@@ -155,6 +154,8 @@ export default function EventPage() {
       console.error('Błąd podczas przesyłania plików:', error);
     }
   };
+  
+  
 
   return (
     <>
