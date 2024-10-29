@@ -10,7 +10,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close'; // Ikona do usuwania zdjęć
 import { API_URL } from '../../../Variables';
-import axios from 'axios';
 
 const theme = createTheme({
   palette: {
@@ -131,31 +130,44 @@ export default function EventPage() {
     });
   
     try {
-      const response = await axios.post(`${API_URL}/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentComplete = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setProgress(percentComplete); // Aktualizuje pasek postępu
-          }
-        },
-      });
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${API_URL}/upload`, true);
   
-      console.log('Pliki przesłane pomyślnie:', response.data);
+      // Ustawienie nagłówka dla przesyłania plików
+      xhr.setRequestHeader('Accept', 'application/json');
   
-      // Zamyka dialog po 0.5 sekundy od zakończenia przesyłania
-      setTimeout(() => {
-        setOpen(false);
-        setProgress(0); // Resetuje pasek postępu
-      }, 500);
+      // Monitoruj postęp przesyłania
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded * 100) / event.total);
+          setProgress(percentComplete);
+        }
+      };
+  
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          console.log('Pliki przesłane pomyślnie:', xhr.responseText);
+          
+          // Zamyka dialog po 0.5 sekundy od zakończenia przesyłania
+          setTimeout(() => {
+            setOpen(false);
+            setProgress(0); // Resetuje pasek postępu
+          }, 500);
+        } else {
+          console.error('Błąd przesyłania plików:', xhr.statusText);
+        }
+      };
+  
+      xhr.onerror = () => {
+        console.error('Błąd podczas przesyłania plików.');
+      };
+  
+      // Wysyłanie danych formularza
+      xhr.send(formData);
     } catch (error) {
       console.error('Błąd podczas przesyłania plików:', error);
     }
   };
-  
-  
 
   return (
     <>
