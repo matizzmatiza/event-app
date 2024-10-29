@@ -133,9 +133,6 @@ export default function EventPage() {
       const xhr = new XMLHttpRequest();
       xhr.open('POST', `${API_URL}/upload`, true);
   
-      // Ustawienie nagłówka dla przesyłania plików
-      xhr.setRequestHeader('Accept', 'application/json');
-  
       // Monitoruj postęp przesyłania
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
@@ -145,9 +142,10 @@ export default function EventPage() {
       };
   
       xhr.onload = () => {
-        if (xhr.status === 200) {
+        // Obsługuje statusy 200 oraz 201 jako pomyślne przesłanie
+        if (xhr.status === 200 || xhr.status === 201) {
           console.log('Pliki przesłane pomyślnie:', xhr.responseText);
-          
+  
           // Zamyka dialog po 0.5 sekundy od zakończenia przesyłania
           setTimeout(() => {
             setOpen(false);
@@ -167,7 +165,7 @@ export default function EventPage() {
     } catch (error) {
       console.error('Błąd podczas przesyłania plików:', error);
     }
-  };
+  };  
 
   return (
     <>
