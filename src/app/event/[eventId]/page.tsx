@@ -129,11 +129,18 @@ export default function EventPage() {
       formData.append(`file_${index}`, file);
     });
   
+    // Symulowany pasek postępu, aktualizowany cyklicznie co 500 ms
+    let simulatedProgress = 0;
+    const intervalId = setInterval(() => {
+      simulatedProgress = Math.min(simulatedProgress + 10, 95); // Do 95%, aby poczekać na zakończenie
+      setProgress(simulatedProgress);
+    }, 500);
+  
     try {
       const xhr = new XMLHttpRequest();
       xhr.open('POST', `${API_URL}/upload`, true);
   
-      // Monitoruj postęp przesyłania
+      // Monitoruj postęp przesyłania rzeczywistego
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
           const percentComplete = Math.round((event.loaded * 100) / event.total);
@@ -142,11 +149,15 @@ export default function EventPage() {
       };
   
       xhr.onload = () => {
-        // Obsługuje statusy 200 oraz 201 jako pomyślne przesłanie
+        clearInterval(intervalId); // Zatrzymanie symulowanego interwału
+  
+        // Sprawdza, czy status jest 200 lub 201
         if (xhr.status === 200 || xhr.status === 201) {
           console.log('Pliki przesłane pomyślnie:', xhr.responseText);
-  
-          // Zamyka dialog po 0.5 sekundy od zakończenia przesyłania
+          
+          // Ustawia pasek na 100% po zakończeniu
+          setProgress(100);
+          
           setTimeout(() => {
             setOpen(false);
             setProgress(0); // Resetuje pasek postępu
@@ -157,12 +168,14 @@ export default function EventPage() {
       };
   
       xhr.onerror = () => {
+        clearInterval(intervalId); // Zatrzymanie symulowanego interwału w razie błędu
         console.error('Błąd podczas przesyłania plików.');
       };
   
       // Wysyłanie danych formularza
       xhr.send(formData);
     } catch (error) {
+      clearInterval(intervalId); // Zatrzymanie symulowanego interwału w razie błędu
       console.error('Błąd podczas przesyłania plików:', error);
     }
   };  
